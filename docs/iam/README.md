@@ -24,13 +24,13 @@
 | 2 | 許可ポリシー名 | `scn-gitops-wangyu-deploy-dev` |
 | 3 | 信頼ポリシー `Principal.Federated` | `arn:aws:iam::646977526034:oidc-provider/token.actions.githubusercontent.com` |
 | 4 | 信頼ポリシー `Action` | `sts:AssumeRoleWithWebIdentity` |
-| 5 | 信頼ポリシー `Condition`（`StringEquals`） | `token.actions.githubusercontent.com:aud` = `sts.amazonaws.com`<br>`token.actions.githubusercontent.com:sub` = `repo:gyokuou0836@5299457/SCN-GitOps-test@<REPO_ID>:environment:dev` |
+| 5 | 信頼ポリシー `Condition`（`StringEquals`） | `token.actions.githubusercontent.com:aud` = `sts.amazonaws.com`<br>`token.actions.githubusercontent.com:sub` = `repo:gyokuou0836@5299457/SCN-GitOps-test@1438003963:environment:dev` |
 | 6 | `sts:TagSession` | **付与しない**（ワークフローは `role-skip-session-tagging: true`） |
 | 7 | スタック操作対象 | `arn:aws:cloudformation:ap-northeast-1:646977526034:stack/scn-gitops-wangyu-dev/*` |
 | 8 | S3 操作対象 | `arn:aws:s3:::scn-gitops-wangyu-dev-646977526034` |
 | 9 | SSM 参照対象 | `arn:aws:ssm:ap-northeast-1:646977526034:parameter/cdk-bootstrap/*` |
 
-`<REPO_ID>` は GitHub のリポジトリ ID（数値）です。リポジトリ作成後に以下で取得できます。
+リポジトリ ID は `1438003963` です（`curl -s https://api.github.com/repos/gyokuou0836/SCN-GitOps-test | jq .id` で再確認できます）。
 
 ```bash
 curl -s https://api.github.com/repos/gyokuou0836/SCN-GitOps-test | jq .id
@@ -54,7 +54,7 @@ curl -s https://api.github.com/repos/gyokuou0836/SCN-GitOps-test | jq .id
       "Condition": {
         "StringEquals": {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": "repo:gyokuou0836@5299457/SCN-GitOps-test@<REPO_ID>:environment:dev"
+          "token.actions.githubusercontent.com:sub": "repo:gyokuou0836@5299457/SCN-GitOps-test@1438003963:environment:dev"
         }
       }
     }
@@ -88,7 +88,7 @@ aws cloudformation deploy \
   --capabilities CAPABILITY_NAMED_IAM \
   --parameter-overrides \
       EnvironmentName=dev \
-      GitHubRepositoryId=<REPO_ID>
+      GitHubRepositoryId=1438003963
 ```
 
 ## 5. 前提確認（CDK bootstrap）
@@ -122,10 +122,10 @@ npx cdk bootstrap aws://646977526034/ap-northeast-1
 
 | 環境 | `sub` |
 |---|---|
-| `dev` | `repo:gyokuou0836@5299457/SCN-GitOps-test@<REPO_ID>:environment:dev` |
-| `staging`（未整備） | `repo:gyokuou0836@5299457/SCN-GitOps-test@<REPO_ID>:environment:staging` |
+| `dev` | `repo:gyokuou0836@5299457/SCN-GitOps-test@1438003963:environment:dev` |
+| `staging`（未整備） | `repo:gyokuou0836@5299457/SCN-GitOps-test@1438003963:environment:staging` |
 
-`@5299457`（オーナー ID）と `@<REPO_ID>`（リポジトリ ID）は不変です。変わるのは末尾の
+`@5299457`（オーナー ID）と `@1438003963`（リポジトリ ID）は不変です。変わるのは末尾の
 `environment:<env>` だけなので、環境追加時は Allow 文を追加するだけで済みます。
 
 ## 9. 改訂履歴

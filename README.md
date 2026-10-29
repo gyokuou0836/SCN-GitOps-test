@@ -40,13 +40,13 @@ GitHub Actions と AWS CDK で S3 バケットを作成・管理する個人検�
 |---|---|
 | OIDC プロバイダ | アカウントに 1 つだけ作成できるため、既存の `token.actions.githubusercontent.com` を再利用（新規作成しない） |
 | IAM ロール / ポリシー | 本リポジトリ専用に新規作成。`github_actions_for_aws` のロールは使用しない |
-| 信頼ポリシー `sub` | `repo:gyokuou0836@5299457/SCN-GitOps-test@<REPO_ID>:environment:${env}` |
+| 信頼ポリシー `sub` | `repo:gyokuou0836@5299457/SCN-GitOps-test@1438003963:environment:${env}` |
 
 詳細と管理者への依頼手順は `docs/iam/README.md` を参照してください。
 
 ## 前提条件
 
-1. GitHub リポジトリ `gyokuou0836/SCN-GitOps-test` が存在し、`<REPO_ID>` が判明している
+1. GitHub リポジトリ `gyokuou0836/SCN-GitOps-test`（リポジトリ ID `1438003963`）が作成済みである
 2. `docs/iam/` の内容で管理者がロールとポリシーを作成済み
 3. `CDKToolkit` スタック（`cdk bootstrap`）が `646977526034` / `ap-northeast-1` に存在する
 4. GitHub Environment `dev` に Secret `AWS_ROLE_ARN` と Variable `BUCKET_NAME` を設定済み
