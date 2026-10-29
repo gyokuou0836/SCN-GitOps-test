@@ -1,79 +1,112 @@
 # SCN-GitOps-wangyu
 
-GitHub Actions / GitOps ‚Å AWS CDK ‚ğg‚Á‚Ä S3 ƒoƒPƒbƒg‚ğì¬‚·‚éŒÂlŒŸØ—pƒvƒƒWƒFƒNƒg‚Å‚·B
-‘ÎÛ: `gyokuou0836/SCN-GitOps-wangyu`iAWS Account: `526034` / Region: `ap-northeast-1`j
+GitHub Actions ã¨ AWS CDK ã§ S3 ãƒã‚±ãƒƒãƒˆã‚’ä½œæˆãƒ»ç®¡ç†ã™ã‚‹å€‹äººæ¤œè¨¼ç”¨ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã§ã™ã€‚
 
-## \¬
+- ãƒ­ãƒ¼ã‚«ãƒ«ãƒ•ã‚©ãƒ«ãƒ€å: `SCN-GitOps-wangyu`
+- GitHub ãƒªãƒã‚¸ãƒˆãƒª: `gyokuou0836/SCN-GitOps-test`
+  ï¼ˆãƒ–ãƒ©ãƒ³ãƒéšå±¤: `main` â†’ `deploy_dev` â†’ `feature/withcdk`ï¼‰
+- AWS ã‚¢ã‚«ã‚¦ãƒ³ãƒˆ: `646977526034` / ãƒªãƒ¼ã‚¸ãƒ§ãƒ³: `ap-northeast-1`
 
-- `bin/scn-gitops-test.ts` : CDK ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg
-- `lib/s3-bucket-stack.ts` : S3 ƒoƒPƒbƒg—p‚ÌƒXƒ^ƒbƒN
-- `.github/workflows/deploy.yml` : GitHub Actions ‚É‚æ‚éƒfƒvƒƒC
+> ãƒ•ã‚©ãƒ«ãƒ€åã¨ãƒªãƒã‚¸ãƒˆãƒªåã¯ç•°ãªã‚Šã¾ã™ã€‚ã‚³ãƒ¼ãƒ‰ã¯å€‹äººã‚¢ã‚«ã‚¦ãƒ³ãƒˆã®æ¤œè¨¼ç”¨ãƒªãƒã‚¸ãƒˆãƒª
+> `SCN-GitOps-test` ã§ç®¡ç†ã—ã¾ã™ã€‚
 
-## ‚±‚ÌƒvƒƒWƒFƒNƒg‚Ìƒpƒ‰ƒ[ƒ^
+## æ§‹æˆ
 
-| €–Ú | „—pŠÂ‹« | Ğ—pŠÂ‹« |
-|---|---|---|
-| GitHubOwner | `gyokuou0836` | `nttdocomo-com` |
-| GitHubOwnerId | `5299457` | `76678837` |
-| GitHubRepositoryiŠù‘¶ GitHub İ’è‚ğÄ—˜—pj | `github_actions_for_aws` | `SCN-GitOps-test` |
-| GitHubRepositoryId | `1416525375` | `1421648569` |
-| Project folder / sample repo | `SCN-GitOps-wangyu` | `SCN-GitOps-test` |
-| EnvironmentName | `dev / [dev, staging, prod]` | `dev / [dev, staging, prod]` |
-| BucketNamePrefix | `ntcs-wan-s3-practice` | `scn-gitops-s3-practice` |
-| LocalUserName | `ntcs-wan` | `ntcs-wan` |
-| CreateOidcProvider | `false`iŠù‘¶ GitHub İ’è‚ğÄ—˜—pj | `false`iŠù‘¶ƒvƒƒoƒCƒ_‚ğ—˜—pj |
-| RoleName | `github-actions-s3-practice-deploy-${EnvironmentName}` | `github-actions-scn-gitops-deploy-${EnvironmentName}` |
-| PolicyName | `s3-practice-deploy` | `scn-gitops-cdk-deploy` |
-| StackName (workflow) | `s3-practice-${TARGET_ENV}` | `scn-gitops-s3-practice-${TARGET_ENV}` |
-| BUCKET_NAME | `ntcs-wan-s3-practice-wangyu-526034` | `scn-gitops-s3-practice-dev-448795058044` |
-
-## GitHub ‘¤‚Ìİ’è‚ÍŠù‘¶‚Ì `github_actions_for_aws` ‚ğÄ—˜—p
-
-- OIDC providerAIAM ƒ[ƒ‹A‹–‰Âƒ|ƒŠƒV[‚ÍAŠù‘¶‚Ì `gyokuou0836/github_actions_for_aws` ‚Åì¬Ï‚İ‚Ì‚à‚Ì‚ğg‚¢‚Ü‚·B
-- ‚±‚±‚Å‚ÍV‹Kì¬‚ğs‚í‚¸AŠù‘¶İ’è‚Ìˆø‚«Œp‚¬‚Æ‚µ‚Äg‚¢‚Ü‚·B
-- `AWS_ROLE_ARN` ‚Æ `BUCKET_NAME` ‚Í GitHub ‚ÌŠù‘¶ Environment / Repository setting ‚ğ‚»‚Ì‚Ü‚Ü—˜—p‚µ‚Ü‚·B
-- `SCN-GitOps-wangyu` ‚ÍƒTƒ“ƒvƒ‹‚Ìì‹ÆƒfƒBƒŒƒNƒgƒŠ–¼EƒvƒƒWƒFƒNƒg–¼‚Å‚ ‚èAGitHub ‘¤‚Ì OIDC À‘Ì‚Í `github_actions_for_aws` ‚Ìİ’è‚ğ‚»‚Ì‚Ü‚Üg‚¢‚Ü‚·B
-
-## d—v‚È‘O’ñ
-
-- `BUCKET_NAME` ‚Í GitHub Environment variable ‚Æˆê’v‚³‚¹‚Ä‚­‚¾‚³‚¢B
-- Šù‘¶‚ÌĞ—pƒvƒƒWƒFƒNƒg‚Ì’l‚ğc‚µ‚½‚Ü‚Ü‚Å‚ÍAŒÂlŠÂ‹«‚Å‚ÌŒŸØ‚ª³‚µ‚­“®ì‚µ‚Ü‚¹‚ñB
-- V‹K‚É OIDC providerAƒ[ƒ‹Aƒ|ƒŠƒV[‚ğì¬‚µ‚Ü‚¹‚ñBŠù‘¶‚Ì `github_actions_for_aws` ‚ğg‚¢‚Ü‚·B
-
-## AWS ‘¤‚ÌŠî–{İ’è
-
-| €–Ú | ’l |
+| ãƒ‘ã‚¹ | å½¹å‰² |
 |---|---|
-| AWS account | `526034` |
-| AWS region | `ap-northeast-1` |
-| OIDC provider | `arn:aws:iam::526034:oidc-provider/token.actions.githubusercontent.com` |
-| Role ARN (—á) | `arn:aws:iam::526034:role/github-actions-s3-practice-deploy-dev` |
-| Bucket name (—á) | `ntcs-wan-s3-practice-wangyu-526034` |
-| Stack name (—á) | `s3-practice-dev` |
+| `bin/scn-gitops-wangyu.ts` | CDK ã‚¢ãƒ—ãƒªã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆ |
+| `lib/s3-bucket-stack.ts` | S3 ãƒã‚±ãƒƒãƒˆç”¨ã‚¹ã‚¿ãƒƒã‚¯ |
+| `.github/workflows/deploy.yml` | GitHub Actions ã«ã‚ˆã‚‹ synthï¼ˆPRï¼‰ã¨ deployï¼ˆpush / æ‰‹å‹•ï¼‰ |
+| `docs/iam/README.md` | IAM ãƒ­ãƒ¼ãƒ«ãƒ»ãƒãƒªã‚·ãƒ¼ã®è¨­å®šä¾é ¼æ›¸ |
+| `docs/iam/github-oidc-role-wangyu.yaml` | ãƒ­ãƒ¼ãƒ«ãƒ»ãƒãƒªã‚·ãƒ¼ã® CloudFormation ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ |
 
-## ƒ[ƒJƒ‹ŒŸØ
+## ãƒªã‚½ãƒ¼ã‚¹å‘½å
+
+| ç¨®åˆ¥ | åå‰ | dev ã®ä¾‹ |
+|---|---|---|
+| ã‚¹ã‚¿ãƒƒã‚¯ | `scn-gitops-wangyu-${env}` | `scn-gitops-wangyu-dev` |
+| S3 ãƒã‚±ãƒƒãƒˆ | `scn-gitops-wangyu-${env}-646977526034` | `scn-gitops-wangyu-dev-646977526034` |
+| IAM ãƒ­ãƒ¼ãƒ« | `github-actions-scn-gitops-wangyu-deploy-${env}` | `github-actions-scn-gitops-wangyu-deploy-dev` |
+| IAM ãƒãƒªã‚·ãƒ¼ | `scn-gitops-wangyu-deploy-${env}` | `scn-gitops-wangyu-deploy-dev` |
+| GitHub Environment | `${env}` | `dev`ï¼ˆ`staging` ã¯æœªæ•´å‚™ï¼‰ |
+
+- ã‚¹ã‚¿ãƒƒã‚¯åã¨ãƒã‚±ãƒƒãƒˆåã«ç’°å¢ƒåã‚’å«ã‚ã€è¤‡æ•°ç’°å¢ƒãŒåŒä¸€ãƒªã‚½ãƒ¼ã‚¹ã‚’å¥ªã„åˆã‚ãªã„ã‚ˆã†ã«ã—ã¦ã„ã¾ã™ã€‚
+- ãƒã‚±ãƒƒãƒˆåã«ã¯ 12 æ¡ã® AWS ã‚¢ã‚«ã‚¦ãƒ³ãƒˆ ID ã‚’å«ã‚ã€æ—¢å­˜ãƒã‚±ãƒƒãƒˆã¨ã®è¡çªã‚’é¿ã‘ã¦ã„ã¾ã™ã€‚
+- æ—¢å­˜ã® `s3-practice-dev` ã‚¹ã‚¿ãƒƒã‚¯ã‚„ `ntcs-wan-s3-practice-wangyu-526034` ãƒã‚±ãƒƒãƒˆã«ã¯å½±éŸ¿ã—ã¾ã›ã‚“ã€‚
+
+## OIDC / IAM ã®è€ƒãˆæ–¹
+
+| é …ç›® | æ–¹é‡ |
+|---|---|
+| OIDC ãƒ—ãƒ­ãƒã‚¤ãƒ€ | ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã« 1 ã¤ã ã‘ä½œæˆã§ãã‚‹ãŸã‚ã€æ—¢å­˜ã® `token.actions.githubusercontent.com` ã‚’å†åˆ©ç”¨ï¼ˆæ–°è¦ä½œæˆã—ãªã„ï¼‰ |
+| IAM ãƒ­ãƒ¼ãƒ« / ãƒãƒªã‚·ãƒ¼ | æœ¬ãƒªãƒã‚¸ãƒˆãƒªå°‚ç”¨ã«æ–°è¦ä½œæˆã€‚`github_actions_for_aws` ã®ãƒ­ãƒ¼ãƒ«ã¯ä½¿ç”¨ã—ãªã„ |
+| ä¿¡é ¼ãƒãƒªã‚·ãƒ¼ `sub` | `repo:gyokuou0836@5299457/SCN-GitOps-test@<REPO_ID>:environment:${env}` |
+
+è©³ç´°ã¨ç®¡ç†è€…ã¸ã®ä¾é ¼æ‰‹é †ã¯ `docs/iam/README.md` ã‚’å‚ç…§ã—ã¦ãã ã•ã„ã€‚
+
+## å‰ææ¡ä»¶
+
+1. GitHub ãƒªãƒã‚¸ãƒˆãƒª `gyokuou0836/SCN-GitOps-test` ãŒå­˜åœ¨ã—ã€`<REPO_ID>` ãŒåˆ¤æ˜ã—ã¦ã„ã‚‹
+2. `docs/iam/` ã®å†…å®¹ã§ç®¡ç†è€…ãŒãƒ­ãƒ¼ãƒ«ã¨ãƒãƒªã‚·ãƒ¼ã‚’ä½œæˆæ¸ˆã¿
+3. `CDKToolkit` ã‚¹ã‚¿ãƒƒã‚¯ï¼ˆ`cdk bootstrap`ï¼‰ãŒ `646977526034` / `ap-northeast-1` ã«å­˜åœ¨ã™ã‚‹
+4. GitHub Environment `dev` ã« Secret `AWS_ROLE_ARN` ã¨ Variable `BUCKET_NAME` ã‚’è¨­å®šæ¸ˆã¿
+
+## ãƒ­ãƒ¼ã‚«ãƒ«ã§ã®æ¤œè¨¼
+
+AWS ã‚¢ã‚«ã‚¦ãƒ³ãƒˆ ID ã®æŒ‡å®šãŒå¿…é ˆã§ã™ï¼ˆ12 æ¡ã§ãªã„å ´åˆã¯æ˜ç¤ºçš„ã«ã‚¨ãƒ©ãƒ¼çµ‚äº†ã—ã¾ã™ï¼‰ã€‚
+
+> âš ï¸ CDK CLI ã¯ãƒ­ãƒ¼ã‚«ãƒ«ã® AWS èªè¨¼æƒ…å ±ã‹ã‚‰ `CDK_DEFAULT_ACCOUNT` ã‚’**ä¸Šæ›¸ã**ã—ã¾ã™ã€‚
+> åˆ¥ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã®èªè¨¼æƒ…å ±ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã¨æ„å›³ã—ãªã„ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã§ synth / deploy ã•ã‚Œã‚‹ãŸã‚ã€
+> `--context account=` ã§æ˜ç¤ºæŒ‡å®šã—ã¦ãã ã•ã„ï¼ˆæœ¬ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã¯ context ã‚’å„ªå…ˆã—ã¾ã™ï¼‰ã€‚
 
 ```bash
 npm ci
 npm run build
-npx cdk synth --context env=dev --context bucketName=ntcs-wan-s3-practice-wangyu-526034
+npx cdk synth --context env=dev --context account=646977526034
 ```
 
-## GitHub Actions ‚Å‚Ìg‚¢•û
+PowerShell ã®å ´åˆ:
 
-- `AWS_ROLE_ARN` ‚ğ GitHub Environment ‚Ì Secret ‚Æ‚µ‚Äİ’è‚·‚é
-- `BUCKET_NAME` ‚ğ GitHub Environment variable ‚Æ‚µ‚Äİ’è‚·‚é
-- `TARGET_ENV` ‚Í `dev` / `staging` / `prod` ‚Ì‚Ç‚ê‚©‚ğg‚¤
-
-—á:
-
-```text
-TARGET_ENV=dev
-BUCKET_NAME=ntcs-wan-s3-practice-wangyu-526034
+```powershell
+npm ci
+npm run build
+npx cdk synth --context env=dev --context account=646977526034
 ```
 
-## ’ˆÓ–€
+ãƒ­ãƒ¼ã‚«ãƒ«ã‹ã‚‰ãƒ‡ãƒ—ãƒ­ã‚¤ã™ã‚‹å ´åˆã¯ã€äº‹å‰ã« `aws sts get-caller-identity` ã§
+ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒ `646977526034` ã§ã‚ã‚‹ã“ã¨ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚
 
-- `CreateOidcProvider=true` ‚Ìê‡AAWS ‚Ì OIDC provider ‚ª‘¶İ‚µ‚È‚¢‚Æ¸”s‚·‚é‚Ì‚Å–‘OŠm”F‚ª•K—v‚Å‚·B
-- `BUCKET_NAME` ‚ª–¢İ’è‚Ì‚Ü‚Ü‚¾‚Æƒ[ƒNƒtƒ[‚ÍƒfƒvƒƒC‘O‚É’â~‚µ‚Ü‚·B
-- ƒXƒ^ƒbƒN–¼‚âƒ[ƒ‹–¼‚ğĞ—p’l‚É‚»‚Ì‚Ü‚Üg‚¤‚ÆAŒÂlŠÂ‹«‚Ì AWS ƒŠƒ\[ƒX‚Æ‹£‡‚µ‚Ü‚·B
+## GitHub Actions
+
+| ã‚¤ãƒ™ãƒ³ãƒˆ | å‹•ä½œ |
+|---|---|
+| `pull_request`ï¼ˆ`deploy_dev` / `deploy_stg` / `main` å‘ã‘ï¼‰ | `validate` ã‚¸ãƒ§ãƒ–ï¼ˆå‹ãƒã‚§ãƒƒã‚¯ + synthï¼‰ã€‚AWS èªè¨¼ã¯è¡Œã‚ãªã„ |
+| `push`ï¼ˆ`deploy_dev` / `deploy_stg`ï¼‰ | `deploy` ã‚¸ãƒ§ãƒ–ï¼ˆOIDC ã§ AssumeRole ã—ã¦ `cdk deploy`ï¼‰ |
+| `workflow_dispatch` | å¯¾è±¡ç’°å¢ƒã‚’é¸ã‚“ã§æ‰‹å‹•ãƒ‡ãƒ—ãƒ­ã‚¤ï¼ˆ`dev` / `staging`ï¼‰ |
+
+ãƒ‡ãƒ—ãƒ­ã‚¤ã¯ `--stack-name scn-gitops-wangyu-${TARGET_ENV}` ã‚’æ˜ç¤ºã—ã¦å®Ÿè¡Œã—ã¾ã™
+ï¼ˆ`--all` ã¯ä½¿ç”¨ã—ã¾ã›ã‚“ï¼‰ã€‚
+
+### Environment ã®è¨­å®šå€¤ï¼ˆdevï¼‰
+
+| ç¨®åˆ¥ | åå‰ | å€¤ |
+|---|---|---|
+| Secret | `AWS_ROLE_ARN` | `arn:aws:iam::646977526034:role/github-actions-scn-gitops-wangyu-deploy-dev` |
+| Variable | `BUCKET_NAME` | `scn-gitops-wangyu-dev-646977526034` |
+
+`BUCKET_NAME` ãŒæœªè¨­å®šã®å ´åˆã€ãƒ¯ãƒ¼ã‚¯ãƒ•ãƒ­ãƒ¼ã¯ãƒ‡ãƒ—ãƒ­ã‚¤å‰ã«åœæ­¢ã—ã¾ã™ã€‚
+
+## åˆå›ãƒ‡ãƒ—ãƒ­ã‚¤æ‰‹é †
+
+1. `feature/withcdk` ã‚’ push ã—ã€`deploy_dev` ã¸ãƒãƒ¼ã‚¸ã™ã‚‹
+2. `deploy_dev` ã¸ã® push ã§ `deploy` ã‚¸ãƒ§ãƒ–ãŒå®Ÿè¡Œã•ã‚Œã‚‹
+3. å¤±æ•—ã—ãŸå ´åˆã¯ã€ŒShow Expected OIDC Subjectã€ã«å‡ºåŠ›ã•ã‚ŒãŸ `sub` ã¨ã€
+   ãƒ­ãƒ¼ãƒ«ã®ä¿¡é ¼ãƒãƒªã‚·ãƒ¼ã‚’ç…§åˆã™ã‚‹
+4. å†å®Ÿè¡Œã—ã¦ `No changes` ã«ãªã‚‹ã“ã¨ã‚’ç¢ºèªã™ã‚‹
+
+## æ³¨æ„äº‹é …
+
+- ãƒã‚±ãƒƒãƒˆã¯ `RemovalPolicy.RETAIN` ã§ã™ã€‚ã‚¹ã‚¿ãƒƒã‚¯ã‚’å‰Šé™¤ã—ã¦ã‚‚ãƒã‚±ãƒƒãƒˆã¯æ®‹ã‚Šã¾ã™
+- `prod` ç’°å¢ƒã¯æœªæ•´å‚™ã§ã™ï¼ˆãƒ­ãƒ¼ãƒ«ã¨ Environment ã‚’ä½œæˆã—ã¦ã‹ã‚‰è¿½åŠ ã—ã¦ãã ã•ã„ï¼‰
+- OIDC ãƒ—ãƒ­ãƒã‚¤ãƒ€ã¯ã‚¢ã‚«ã‚¦ãƒ³ãƒˆã« 1 ã¤ã ã‘ãªã®ã§ã€ãƒ­ãƒ¼ãƒ«ä½œæˆæ™‚ã«åŒæ™‚ä½œæˆã—ãªã„ã§ãã ã•ã„
+  ï¼ˆ`NAME_CONFLICT_VALIDATION` ã«ãªã‚Šã¾ã™ï¼‰

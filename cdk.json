@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/scn-gitops-test.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/scn-gitops-wangyu.ts",
   "watch": {
     "include": [
       "**/*.ts",

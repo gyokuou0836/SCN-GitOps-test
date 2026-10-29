@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  GitHub Actions OIDC deploy role for gyokuou0836/SCN-GitOps-test
+  (S3 practice bucket). OIDC provider is reused, not created here.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    AllowedValues: [dev, staging]
+    Default: dev
+    Description: Target environment name (also used in role/policy/resource names)
+  GitHubOwner:
+    Type: String
+    Default: gyokuou0836
+  GitHubOwnerId:
+    Type: String
+    Default: "5299457"
+    Description: GitHub owner (user) immutable ID
+  GitHubRepository:
+    Type: String
+    Default: SCN-GitOps-test
+  GitHubRepositoryId:
+    Type: String
+    Description: GitHub repository immutable ID (numeric). Required.
+  AllowClassicSubject:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "false"
+    Description: >-
+      Set true only when the repository does not use immutable OIDC subjects.
+      Ensure it is false after confirming the actual sub claim.
+
+Conditions:
+  UseClassicSubject: !Equals [!Ref AllowClassicSubject, "true"]
+
+Resources:
+  GitHubActionsDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "github-actions-scn-gitops-wangyu-deploy-${EnvironmentName}"
+      Description: GitHub Actions deploy role for SCN-GitOps-test (CDK / S3)
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # immutable subject (推奨)
+          - Sid: GitHubActionsOidcImmutable
+            Effect: Allow
+            Principal:
+              Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub >-
+                  repo:${GitHubOwner}@${GitHubOwnerId}/${GitHubRepository}@${GitHubRepositoryId}:environment:${EnvironmentName}
+          # 旧形式 subject（immutable 無効時のみ AllowClassicSubject=true で有効化する）
+          - !If
+            - UseClassicSubject
+            - Sid: GitHubActionsOidcClassic
+              Effect: Allow
+              Principal:
+                Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition:
+                StringEquals:
+                  token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                  token.actions.githubusercontent.com:sub: !Sub >-
+                    repo:${GitHubOwner}/${GitHubRepository}:environment:${EnvironmentName}
+            - !Ref AWS::NoValue
+
+  GitHubActionsDeployPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub "scn-gitops-wangyu-deploy-${EnvironmentName}"
+      Roles:
+        - !Ref GitHubActionsDeployRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: CloudFormationStack
+            Effect: Allow
+            Action:
+              - cloudformation:CreateStack
+              - cloudformation:UpdateStack
+              - cloudformation:DescribeStacks
+              - cloudformation:DescribeStackEvents
+              - cloudformation:DescribeStackResources
+              - cloudformation:ListStackResources
+              - cloudformation:GetTemplate
+              - cloudformation:CreateChangeSet
+              - cloudformation:DescribeChangeSet
+              - cloudformation:ExecuteChangeSet
+              - cloudformation:DeleteChangeSet
+            Resource: !Sub >-
+              arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/scn-gitops-wangyu-${EnvironmentName}/*
+          - Sid: CloudFormationTemplateSummary
+            Effect: Allow
+            Action:
+              - cloudformation:GetTemplateSummary
+            Resource: "*"
+          - Sid: S3Bucket
+            Effect: Allow
+            Action:
+              - s3:CreateBucket
+              - s3:PutBucketVersioning
+              - s3:PutEncryptionConfiguration
+              - s3:PutBucketPublicAccessBlock
+              - s3:PutBucketPolicy
+              - s3:DeleteBucketPolicy
+              - s3:PutBucketOwnershipControls
+              - s3:PutBucketTagging
+              - s3:GetBucketLocation
+              - s3:GetBucketVersioning
+              - s3:GetEncryptionConfiguration
+              - s3:GetBucketPublicAccessBlock
+              - s3:GetBucketPolicy
+              - s3:GetBucketOwnershipControls
+              - s3:GetBucketAcl
+              - s3:GetBucketTagging
+              - s3:ListBucket
+            Resource: !Sub "arn:aws:s3:::scn-gitops-wangyu-${EnvironmentName}-${AWS::AccountId}"
+          - Sid: CdkBootstrapVersion
+            Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cdk-bootstrap/*"
+
+Outputs:
+  RoleArn:
+    Value: !GetAtt GitHubActionsDeployRole.Arn
+    Description: Set this value to the GitHub Environment secret AWS_ROLE_ARN
+  BucketName:
+    Value: !Sub "scn-gitops-wangyu-${EnvironmentName}-${AWS::AccountId}"
+    Description: Set this value to the GitHub Environment variable BUCKET_NAME
+  StackName:
+    Value: !Sub "scn-gitops-wangyu-${EnvironmentName}"
+    Description: CloudFormation stack name used by the deploy workflow
