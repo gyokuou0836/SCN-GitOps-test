@@ -1,0 +1,125 @@
+name: deploy
+# GitHub Actions で CDK アプリケーションを作成・更新するためのワークフロー
+# GitHub OIDC を利用して AWS の IAM ロールを引き受け、S3 バケットを構築する
+# 個人環境向けの命名規則と環境変数設定を前提にしている
+
+on:
+  push:
+    branches: [deploy_dev, deploy_stg]
+    paths:
+      - "bin/**"
+      - "lib/**"
+      - "cdk.json"
+      - "package*.json"
+      - "tsconfig.json"
+      - ".github/workflows/deploy.yml"
+  pull_request:
+    branches: [deploy_dev, deploy_stg]
+    paths:
+      - "bin/**"
+      - "lib/**"
+      - "cdk.json"
+      - "package*.json"
+      - "tsconfig.json"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check CDK app
+        run: npm run build
+
+      - name: Synthesize CDK app
+        run: npx cdk synth --context env=dev --context bucketName=ntcs-wan-s3-practice-wangyu-526034
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || (github.ref_name == 'deploy_stg' && 'staging') || 'dev' }}
+    env:
+      TARGET_ENV: ${{ inputs.environment || (github.ref_name == 'deploy_stg' && 'staging') || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install deployment dependencies
+        run: npm ci
+
+      - name: Debug OIDC Token Claims
+        run: |
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
+          if [ -n "$TOKEN" ] && [ "$TOKEN" != "null" ]; then
+            echo "=== OIDC Token Header & Payload (signature omitted) ==="
+            python3 -c "
+          import sys, json, base64
+          t = sys.argv[1]
+          parts = t.split('.')
+          def pad(b): return b + '=' * (-len(b) % 4)
+          header = json.loads(base64.urlsafe_b64decode(pad(parts[0])))
+          payload = json.loads(base64.urlsafe_b64decode(pad(parts[1])))
+          print('Header:', json.dumps(header))
+          for k in ['iss', 'aud', 'sub', 'repository', 'environment', 'ref', 'actor']:
+              print(f'  {k}: {payload.get(k)}')
+          " "$TOKEN"
+          fi
+
+      - name: Show Expected OIDC Subject
+        env:
+          OWNER_ID: ${{ github.repository_owner_id }}
+          REPO_ID: ${{ github.repository_id }}
+        run: |
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          REPO="${GITHUB_REPOSITORY#*/}"
+          echo "=== 信頼ポリシーが必要とする sub (immutable subject) ==="
+          if [ -n "$OWNER_ID" ] && [ -n "$REPO_ID" ]; then
+            echo "  repo:${OWNER}@${OWNER_ID}/${REPO}@${REPO_ID}:environment:${TARGET_ENV}"
+          else
+            echo "  repo:<owner>@<owner-id>/<repo>@<repo-id>:environment:${TARGET_ENV}"
+          fi
+          echo "  ※ 上の Debug ステップの sub と一致する必要があります"
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-skip-session-tagging: true
+
+      - name: Check required variables
+        run: |
+          if [ -z "${{ vars.BUCKET_NAME }}" ]; then
+            echo "::error::Environment 変数 BUCKET_NAME が未設定です（例: ntcs-wan-s3-practice-wangyu-526034）"
+            exit 1
+          fi
+
+      - name: Deploy stack
+        run: |
+          npx cdk deploy --require-approval never --all \
+            --context env="${TARGET_ENV}" \
+            --context bucketName="${{ vars.BUCKET_NAME }}"
